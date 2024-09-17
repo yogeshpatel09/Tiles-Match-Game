@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="./output.css" rel="stylesheet" />
+  </head>
+  <body
+    class="flex gap-8 justify-center items-center h-screen bg-[url('bgimg.jpg')] bg-cover bg-center"
+  >
+    <div class="space-y-4">
+      <div class="flex flex-col gap-4">
+        <button
+          id="Easy"
+          class="h-14 w-44 rounded-lg font-bold text-3xl bg-purple-400"
+        >
+          Easy
+        </button>
+        <button
+          id="Medium"
+          class="h-14 w-44 rounded-lg font-bold text-3xl bg-purple-400"
+        >
+          Medium
+        </button>
+        <button
+          id="Hard"
+          class="h-14 w-44 rounded-lg font-bold text-3xl bg-purple-400"
+        >
+          Hard
+        </button>
+
+        <button
+          id="Home"
+          class="h-14 w-44 rounded-lg font-bold text-3xl bg-purple-700"
+        >
+          Home
+        </button>
+        <div id="boxclick" class="hidden font-bold text-2xl text-center">
+          Box Clicks : 0
+        </div>
+        <div id="boxPair" class="hidden font-bold text-2xl text-center">
+          Box Pairs : 0
+        </div>
+      </div>
+    </div>
+
+    <img id="img" src="unnamed.png" alt="" />
+
+    <div id="grid-container" class="grid grid-cols-4 p-1 gap-3"></div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("Home").addEventListener("click", function () {
+          window.location.reload();
+        });
+        
+        let flippedBoxes = [];
+        let disableClick = false;
+        let boxClickCount = 0;
+        let boxPairCount = 0;
+        
+        function updateClickBox() {
+          document.getElementById("Easy").innerHTML = "Restart";
+          document.getElementById("Medium").innerHTML = "Restart";
+          document.getElementById("Hard").innerHTML = "Restart";
+          boxClickCount++;
+          document.getElementById("boxclick").innerHTML = `Box Clicks: ${boxClickCount}`;
+        }
+        
+        function updateBoxPair() {
+          boxPairCount++;
+          document.getElementById("boxPair").innerText = `Box Pairs: ${boxPairCount}`;
+        }
+        
+        function randomColor() {
+          let letters = "ABCDEF0123456789";
+          let color = "#";
+          for (let i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+          }
+          return color;
+        }
+        
+        function colorPairs(numberOfPairs) {
+          let colorBox = [];
+          for (let i = 0; i < numberOfPairs; i++) {
+            let color = randomColor();
+            colorBox.push(color, color);
+          }
+          return colorBox.sort(() => 0.5 - Math.random());
+        }
+        
+        function createBox(numberOfBoxes) {
+          const container = document.getElementById("grid-container");
+          container.innerHTML = "";
+          
+          const numberOfPairs = numberOfBoxes / 2;
+          const colorBox = colorPairs(numberOfPairs);
+          
+          for (let i = 1; i <= numberOfBoxes; i++) {
+            const box = document.createElement("div");
+            box.id = `box${i}`;
+            box.className = "grid rounded-lg w-[100px] h-[100px] text-center";
+            
+            // Assign colors correctly using the current index
+            box.setAttribute("data-color", colorBox[i - 1]); // Correct index
+            
+            box.style.backgroundColor = "#ffffff";
+            
+            box.addEventListener("click", function () {
+              document.getElementById("boxclick").classList.remove("hidden");
+              updateClickBox();
+              if (!disableClick && flippedBoxes.length < 2) {
+                flipBox(box);
+                flippedBoxes.push(box);
+                if (flippedBoxes.length === 2) {
+                  checkMatch();
+                }
+              }
+            });
+            
+            container.appendChild(box);
+          }
+        }
+        
+        function flipBox(box) {
+          box.style.backgroundColor = box.getAttribute("data-color");
+        }
+        
+        function checkMatch() {
+          const [box1, box2] = flippedBoxes;
+          disableClick = true;
+          
+          if (box1.getAttribute("data-color") === box2.getAttribute("data-color")) {
+            document.getElementById("boxPair").classList.remove("hidden");
+            updateBoxPair();
+            flippedBoxes = [];
+            disableClick = false;
+          } else {
+            setTimeout(() => {
+              flipBack(box1);
+              flipBack(box2);
+              flippedBoxes = [];
+              disableClick = false;
+            }, 300);
+          }
+        }
+        
+        function flipBack(box) {
+          box.style.backgroundColor = "#FFFFFF";
+        }
+        
+        document.getElementById("Easy").addEventListener("click", function () {
+          document.getElementById("img").classList.add("hidden");
+          boxClickCount = 0;
+          document.getElementById("boxclick").innerHTML = `Box Clicks: 0`;
+          boxPairCount = 0;
+          document.getElementById("boxPair").innerHTML = `Box Pairs: 0`;
+          
+          createBox(12);
+          document.getElementById("Medium").classList.add("hidden");
+          document.getElementById("Hard").classList.add("hidden");
+        });
+        
+        document.getElementById("Medium").addEventListener("click", function () {
+          document.getElementById("img").classList.add("hidden");
+          boxClickCount = 0;
+          document.getElementById("boxclick").innerHTML = `Box Clicks: 0`;
+          boxPairCount = 0;
+          document.getElementById("boxPair").innerHTML = `Box Pairs: 0`;
+          
+          createBox(16);
+          document.getElementById("Easy").classList.add("hidden");
+          document.getElementById("Hard").classList.add("hidden");
+        });
+        
+        document.getElementById("Hard").addEventListener("click", function () {
+          document.getElementById("img").classList.add("hidden");
+          boxClickCount = 0;
+          document.getElementById("boxclick").innerHTML = `Box Clicks: 0`;
+          boxPairCount = 0;
+          document.getElementById("boxPair").innerHTML = `Box Pairs: 0`;
+          
+          createBox(24);
+          document.getElementById("Easy").classList.add("hidden");
+          document.getElementById("Medium").classList.add("hidden");
+        });
+      });
+    </script>
+  </body>
+</html>
